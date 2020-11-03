@@ -82,6 +82,14 @@ public class ArrayIndexedCollection<T> implements List<T> {
     }
 
     /**
+     * Returns number of allocated places for elements.
+     * @return number of allocated places for elements
+     */
+    public int getAllocatedSize() {
+        return elements.length;
+    }
+
+    /**
      * @return number of currently stored objects in this Collection.
      */
     @Override

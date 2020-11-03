@@ -52,6 +52,14 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
     }
 
     /**
+     * Getter for slots.
+     * @return number of slots allocated in memory
+     */
+    public int getSlots() {
+        return slots;
+    }
+
+    /**
      * Updates or adds new TableEntry to Hashtable depending if there was TableEntry with given key. If Hashtable
      * fill-ratio (num_entries / num_slots) becomes >= 75%, number of slots is doubled, and all elements are
      * reallocated.
@@ -63,7 +71,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
     @SuppressWarnings("unchecked")
     public V put(K key, V value) {
         if (key == null)
-            throw new IllegalArgumentException("Hashtable key can't be null");
+            throw new NullPointerException("Hashtable key can't be null");
 
         // Reallocation if fill-ratio >= 75%
         if (((double) size / (double) slots) >= 0.75) {
@@ -113,7 +121,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
      * Clears all TableEntries from Hashtable. It doesn't change capacity (slots) of Hashtable.
      */
     @SuppressWarnings("unchecked")
-    private void clear() {
+    public void clear() {
         table = (TableEntry<K, V>[]) new TableEntry[slots];
         modificationCount++;
         size = 0;

@@ -21,8 +21,6 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         </plugins>
     </build>
     <packaging>jar</packaging>
-	
-	<name>Homework_01</name>
 
 	<properties>
 		<junit.jupiter.version>5.7.0</junit.jupiter.version>
