@@ -36,6 +36,14 @@ public class Dictionary<K, V> {
         public V getValue() {
             return value;
         }
+
+        @Override
+        public String toString() {
+            return "DictionaryEntry{" +
+                    "key=" + key +
+                    ", value=" + value +
+                    '}';
+        }
     }
 
     /**
@@ -131,4 +139,10 @@ public class Dictionary<K, V> {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return "Dictionary{" +
+                "dictionary=" + dictionary +
+                '}';
+    }
 }

@@ -13,11 +13,9 @@ public class ScaleCommand implements Command {
 
     @Override
     public void execute(Context ctx, Painter painter) {
-        ctx.getCurrentState()
-                .setCurrentDrawLength(
-                        ctx.getCurrentState()
-                                .getCurrentDrawLength() * factor
-                );
+        double currentDrawLength = ctx.getCurrentState().getCurrentDrawLength();
+
+        ctx.getCurrentState().setCurrentDrawLength(currentDrawLength * factor);
     }
 
 }

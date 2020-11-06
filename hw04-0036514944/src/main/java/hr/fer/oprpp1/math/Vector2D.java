@@ -61,7 +61,7 @@ public class Vector2D {
     /**
      * Method rotates current Vector2D by given argument angle.
      *
-     * @param angle angle to rotate current Vector2D object.
+     * @param angle angle degrees to rotate current Vector2D object.
      */
     public void rotate(double angle) {
         double rx = (this.x * Math.cos(angle)) - (this.y * Math.sin(angle));
@@ -74,7 +74,7 @@ public class Vector2D {
      * Method returns new Vector2D by rotation of current Vector2D.
      *
      * @param angle angle to rotate current Vector2D object
-     * @return new Vector2D created by rotation of current Vector2D by angle
+     * @return new Vector2D created by rotation of current Vector2D by angle in radians
      */
     public Vector2D rotated(double angle) {
         double rx = (this.x * Math.cos(angle)) - (this.y * Math.sin(angle));
@@ -109,4 +109,11 @@ public class Vector2D {
         return new Vector2D(this.x, this.y);
     }
 
+    @Override
+    public String toString() {
+        return "Vector2D{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

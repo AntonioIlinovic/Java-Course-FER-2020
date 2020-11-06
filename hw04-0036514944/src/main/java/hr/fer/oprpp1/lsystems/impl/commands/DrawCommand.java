@@ -34,13 +34,7 @@ public class DrawCommand implements Command {
                 1f
         );
 
-        TurtleState newState = new TurtleState(
-                endPoint,
-                currentState.getCurrentAngle(),
-                currentState.getCurrentColor(),
-                currentState.getCurrentDrawLength()
-        );
-        ctx.pushState(newState);
+        ctx.getCurrentState().setCurrentPosition(endPoint);
     }
 
 }

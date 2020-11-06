@@ -21,18 +21,11 @@ public class SkipCommand implements Command {
         double drawLength = step * currentState.getCurrentDrawLength();
         Vector2D offset = currentState
                 .getCurrentAngle()
-                .scaled(step);
-        Vector2D endPoint = currentState
-                .getCurrentPosition()
+                .scaled(drawLength);
+        Vector2D endPoint = startPoint
                 .added(offset);
 
-        TurtleState newState = new TurtleState(
-                endPoint,
-                currentState.getCurrentAngle(),
-                currentState.getCurrentColor(),
-                currentState.getCurrentDrawLength()
-        );
-        ctx.pushState(newState);
+        ctx.getCurrentState().setCurrentPosition(endPoint);
     }
 
 }

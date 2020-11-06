@@ -1,4 +1,4 @@
-package hr.fer.oprpp1.lsystems.impl.demo;
+package hr.fer.oprpp1.lsystems.demo;
 
 import hr.fer.zemris.lsystems.LSystem;
 import hr.fer.zemris.lsystems.Painter;

@@ -54,4 +54,13 @@ public class TurtleState {
         return new TurtleState(currentPosition, currentAngle, currentColor, currentDrawLength);
     }
 
+    @Override
+    public String toString() {
+        return "TurtleState{" +
+                "currentPosition=" + currentPosition +
+                ", currentAngle=" + currentAngle +
+                ", currentColor=" + currentColor +
+                ", currentDrawLength=" + currentDrawLength +
+                '}';
+    }
 }
