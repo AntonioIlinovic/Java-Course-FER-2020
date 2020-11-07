@@ -9,7 +9,7 @@ import hr.fer.zemris.lsystems.gui.LSystemViewer;
 
 public class Glavni1 {
     public static void main(String[] args) {
-        LSystemViewer.showLSystem(createPlant1(LSystemBuilderImpl::new));
+        LSystemViewer.showLSystem(createKochCurve3(LSystemBuilderImpl::new));
     }
 
     private static LSystem createKochCurve(LSystemBuilderProvider provider) {
