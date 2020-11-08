@@ -4,13 +4,27 @@ import hr.fer.oprpp1.math.Vector2D;
 
 import java.awt.*;
 
+/**
+ * Class which remembers current state of the turtle. It has its position, angle, color, and current draw length.
+ */
 public class TurtleState {
 
+    /* Current turtle's Position as radius-vector */
     private Vector2D currentPosition;
+    /* Current turtle's Position as direction vector */
     private Vector2D currentAngle;
+    /* Current color by which turtle draws */
     private Color currentColor;
+    /* Current effective draw length which corresponds if it gets command to draw a unit length */
     private double currentDrawLength;
 
+    /**
+     * Constructor for TurtleState saves given state.
+     * @param currentPosition currentPosition
+     * @param currentAngle currentAngle
+     * @param currentColor currentColor
+     * @param currentDrawLength currentDrawLength
+     */
     public TurtleState(Vector2D currentPosition, Vector2D currentAngle, Color currentColor, double currentDrawLength) {
         this.currentPosition = currentPosition;
         this.currentAngle = currentAngle;
@@ -50,6 +64,10 @@ public class TurtleState {
         this.currentDrawLength = currentDrawLength;
     }
 
+    /**
+     * Returns a new Instance of this TurtleState.
+     * @return a new Instance of this TurtleState
+     */
     public TurtleState copy() {
         return new TurtleState(currentPosition, currentAngle, currentColor, currentDrawLength);
     }

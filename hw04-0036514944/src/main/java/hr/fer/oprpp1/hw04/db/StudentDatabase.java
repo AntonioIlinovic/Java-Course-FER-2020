@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.Assertions;
-
 /**
  * Class has internal list of student records. Its constructor must get a list of String objects (the content of
  * database.txt, each String represents one row of the database file). Additionally, it has index for fast retrieval of

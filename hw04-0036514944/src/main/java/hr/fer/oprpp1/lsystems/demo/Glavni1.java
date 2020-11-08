@@ -4,12 +4,20 @@ import hr.fer.oprpp1.lsystems.impl.LSystemBuilderImpl;
 import hr.fer.oprpp1.math.AngleConverter;
 import hr.fer.oprpp1.math.Vector2D;
 import hr.fer.zemris.lsystems.LSystem;
+import hr.fer.zemris.lsystems.LSystemBuilder;
 import hr.fer.zemris.lsystems.LSystemBuilderProvider;
 import hr.fer.zemris.lsystems.gui.LSystemViewer;
 
 public class Glavni1 {
     public static void main(String[] args) {
-        LSystemViewer.showLSystem(createKochCurve3(LSystemBuilderImpl::new));
+        // LSystemViewer.showLSystem(createKochCurve2(LSystemBuilderImpl::new));
+
+        LSystemViewer.showLSystem(new LSystemBuilderProvider() {
+            @Override
+            public LSystemBuilder createLSystemBuilder() {
+                return new LSystemBuilderImpl();
+            }
+        });
     }
 
     private static LSystem createKochCurve(LSystemBuilderProvider provider) {
@@ -17,11 +25,13 @@ public class Glavni1 {
                 .registerCommand('F', "draw 1")
                 .registerCommand('+', "rotate 60")
                 .registerCommand('-', "rotate -60")
+                .registerCommand('[', "rotate 90")
+                .registerCommand(']', "rotate -90")
                 .setOrigin(0.05, 0.4)
                 .setAngle(0)
-                .setUnitLength(0.9)
+                .setUnitLength(0.45)
                 .setUnitLengthDegreeScaler(1.0/3.0)
-                .registerProduction('F', "F+F--F+F")
+                .registerProduction('F', "F+F--F+F]F+F--F+F")
                 .setAxiom("F")
                 .build();
     }

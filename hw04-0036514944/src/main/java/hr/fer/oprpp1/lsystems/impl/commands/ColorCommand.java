@@ -5,6 +5,9 @@ import hr.fer.zemris.lsystems.Painter;
 
 import java.awt.*;
 
+/**
+ * Accepts Color through constructor and sets it to the current TurtleState of the Context.
+ */
 public class ColorCommand implements Command {
 
     private Color color;

@@ -7,6 +7,9 @@ import hr.fer.zemris.lsystems.Painter;
 
 import static hr.fer.oprpp1.math.AngleConverter.RadiansToDegrees;
 
+/**
+ * Accepts angle through constructor. Changes current TurtleState from the Context so it has that angle.
+ */
 public class RotateCommand implements Command {
 
     private double angle;

@@ -5,6 +5,10 @@ import hr.fer.oprpp1.lsystems.impl.TurtleState;
 import hr.fer.oprpp1.math.Vector2D;
 import hr.fer.zemris.lsystems.Painter;
 
+/**
+ * Accepts step through constructor, calculates where the Turtle needs to go, and goes from current position
+ * to destination without drawing anything. Destination position is saved to current state of the Context.
+ */
 public class SkipCommand implements Command {
 
     double step;
