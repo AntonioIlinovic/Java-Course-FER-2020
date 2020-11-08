@@ -7,7 +7,7 @@ import java.util.List;
 
 public class StudentDatabaseTest {
 
-    private static StudentDatabase getDatabaseWithFiveStudentRecords() {
+    static StudentDatabase getDatabaseWithFiveStudentRecords() {
         List<String> studentAsStrings = List.of(new String[]{
                 "0000000001	Akšamović	Marin	2",
                 "0000000002	Bakamović	Petra	3",

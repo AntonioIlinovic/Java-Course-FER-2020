@@ -63,4 +63,14 @@ public class StudentRecord {
     public int hashCode() {
         return Objects.hash(jmbag);
     }
+
+    @Override
+    public String toString() {
+        return "StudentRecord{" +
+                "jmbag='" + jmbag + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", finalGrade=" + finalGrade +
+                '}';
+    }
 }
