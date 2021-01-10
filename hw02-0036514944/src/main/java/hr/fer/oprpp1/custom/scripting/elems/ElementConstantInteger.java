@@ -9,7 +9,8 @@ public class ElementConstantInteger extends Element {
 
     /**
      * Constructor for {@link ElementConstantInteger}.
-     * @param value int to initialize {@link ElementConstantInteger} with.
+     *
+     * @param value int to initialize {@link ElementConstantInteger} with
      */
     public ElementConstantInteger(int value) {
         this.value = value;
@@ -17,6 +18,7 @@ public class ElementConstantInteger extends Element {
 
     /**
      * Getter for int value.
+     *
      * @return int value
      */
     public int getValue() {
@@ -24,7 +26,7 @@ public class ElementConstantInteger extends Element {
     }
 
     /**
-     * @return ConstantInteger in String format.
+     * @return ConstantInteger in String format
      */
     @Override
     public String asText() {

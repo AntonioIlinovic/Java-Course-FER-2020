@@ -10,7 +10,8 @@ public class TextNode extends Node {
 
     /**
      * Constructor for {@link TextNode}.
-     * @param text text for {@link TextNode}.
+     *
+     * @param text text for {@link TextNode}
      */
     public TextNode(String text) {
         this.text = text;
@@ -18,7 +19,8 @@ public class TextNode extends Node {
 
     /**
      * Text getter.
-     * @return text of {@link TextNode}.
+     *
+     * @return text of {@link TextNode}
      */
     public String getText() {
         return text;
@@ -40,9 +42,10 @@ public class TextNode extends Node {
     }
 
     /**
-     * toString method for TextNode. It prints in format such that if read again by a parser, it would result
-     * in the same TextNode structure.
-     * @return toString of a TextNode.
+     * toString method for TextNode. It prints in format such that if read again by a parser, it would result in the
+     * same TextNode structure.
+     *
+     * @return toString of a TextNode
      */
     @Override
     public String toString() {

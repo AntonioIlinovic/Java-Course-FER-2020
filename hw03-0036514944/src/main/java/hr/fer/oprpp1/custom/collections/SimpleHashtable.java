@@ -3,7 +3,6 @@ package hr.fer.oprpp1.custom.collections;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 /**
  * Class which implements a Map. It is parametrized by key with type K, and value with type V. Class represents hash
@@ -17,18 +16,15 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 
     private int size;                   // Number of TableEntries in HashTable
     private TableEntry<K, V>[] table;   // Table of Entries
-    private int slots;                       // Number of allocated slots
-    private int modificationCount;
+    private int slots;                  // Number of allocated slots
+    private int modificationCount;      // Initialized when instance is created, used to throw error when changing while iterating
+    private final static int DEFAULT_CAPACITY = 16;
 
     /**
      * Default constructor for SimpleHashtable. It will initialize an empty array of 16 slots for TableEntries.
      */
-    @SuppressWarnings("unchecked")
     public SimpleHashtable() {
-        this.size = 0;
-        this.slots = 16;
-        this.modificationCount = 0;
-        table = (TableEntry<K, V>[]) new TableEntry[slots];
+        this(DEFAULT_CAPACITY);
     }
 
     /**
@@ -38,12 +34,11 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
      */
     @SuppressWarnings("unchecked")
     public SimpleHashtable(int capacity) {
-        this.size = 0;
-        this.modificationCount = 0;
-
         if (capacity < 1)
             throw new IllegalArgumentException("SimpleHashtable constructor accepts only initialCapacity more or equal to 1, yours was: " + capacity);
 
+        this.size = 0;
+        this.modificationCount = 0;
         // This sets initialCapacity to first power of 2 greater or equal to argument initialCapacity
         capacity = (int) Math.pow(2, 32 - Integer.numberOfLeadingZeros(capacity - 1));
 
@@ -52,7 +47,8 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
     }
 
     /**
-     * Getter for slots.
+     * Getter for number of slots.
+     *
      * @return number of slots allocated in memory
      */
     public int getSlots() {
@@ -68,53 +64,58 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
      * @param value value for new TableEntry
      * @return null if there was no TableEntry with given key, value of overwritten TableEntry otherwise
      */
-    @SuppressWarnings("unchecked")
     public V put(K key, V value) {
         if (key == null)
             throw new NullPointerException("Hashtable key can't be null");
 
         // Reallocation if fill-ratio >= 75%
-        if (((double) size / (double) slots) >= 0.75) {
-            modificationCount++;
-            TableEntry<K, V>[] tableEntries = toArray();
-            clear();
-            slots *= 2;                             // double the number of slots in Hashtable
-            table = (TableEntry<K, V>[]) new TableEntry[slots];
-
-            // We can't just use System.arraycopy(...), because number of slots is changed, therefore indexes of TableEntries are also changed
-            for (TableEntry<K, V> tableEntry : tableEntries) {
-                put(tableEntry.getKey(), tableEntry.getValue());
-            }
-
-            /* We need to set size again because clear() sets size to 0. Also size must be changed after
-            we reallocate all TableEntries because if not it can call put again and start reallocating again. */
-            size = tableEntries.length;
-        }
+        if (((double) size / (double) slots) >= 0.75)
+            reallocateTable();
 
         int slotIndex = calculateSlot(key);
         if (table[slotIndex] == null) {
+            // If there is no entries in given slot
             table[slotIndex] = new TableEntry<>(key, value, null);
             size++;
             modificationCount++;
             return null;
-        } else {
-            TableEntry<K, V> tableWalker = table[slotIndex];
-            while (tableWalker.next != null && !tableWalker.getKey().equals(key)) {
-                tableWalker = tableWalker.next;
-            }
-
-            if (tableWalker.next == null) {
-                tableWalker.next = new TableEntry<>(key, value, null);
-                size++;
-                modificationCount++;
-                return null;
-            } else {
-                // If pair is updated, modificationCount is not increased
-                V oldValue = tableWalker.getValue();
-                tableWalker.setValue(value);
-                return oldValue;
-            }
         }
+
+        TableEntry<K, V> tableWalker = table[slotIndex];
+        // Move tableWalker until you get to the entry with the same key or end of table slot
+        while (tableWalker.next != null && !tableWalker.getKey().equals(key))
+            tableWalker = tableWalker.next;
+
+        if (tableWalker.getKey().equals(key)) {
+            // TableEntry is updated, modificationCount is not incremented
+            V oldValue = tableWalker.getValue();
+            tableWalker.setValue(value);
+            return oldValue;
+        } else {
+            // tableWalker is at the last entry and there is no entry with given key
+            tableWalker.next = new TableEntry<>(key, value, null);
+            size++;
+            modificationCount++;
+            return null;
+        }
+    }
+
+    /**
+     * Reallocates and doubles table of TableEntry.
+     */
+    @SuppressWarnings("unchecked")
+    private void reallocateTable() {
+        modificationCount++;
+        TableEntry<K, V>[] tableEntries = toArray();
+        /* clear() sets size to 0. Size is incremented while reallocating all TableEntries,
+        method reallocateTable() won't be called while reallocating */
+        clear();
+        slots *= 2;                             // double the number of slots in Hashtable
+        table = (TableEntry<K, V>[]) new TableEntry[slots];
+
+        // We can't just use System.arraycopy(...), because number of slots is changed, therefore calculated indexes of TableEntries are also changed
+        for (TableEntry<K, V> entry : tableEntries)
+            put(entry.getKey(), entry.getValue());
     }
 
     /**
@@ -141,16 +142,18 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
             return null;
 
         TableEntry<K, V> tableWalker = table[slotIndex];
-        while (tableWalker.next != null && !tableWalker.getKey().equals(key)) {
+        // Move tableWalker until you get to the entry with the same key or end of table slot
+        while (tableWalker.next != null && !tableWalker.getKey().equals(key))
             tableWalker = tableWalker.next;
-        }
 
-        if (tableWalker.getKey().equals(key))
-            return tableWalker.getValue();
-
-        return null;
+        return tableWalker.getKey().equals(key) ? tableWalker.getValue() : null;
     }
 
+    /**
+     * Returns number of TableEntries in HashTable.
+     *
+     * @return number of TableEntries in HashTable
+     */
     public int size() {
         return size;
     }
@@ -168,11 +171,11 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
         if (table[slotIndex] == null)
             return false;
 
-        /* We could implement it using iterator, but this will jump straight to slot of a key */
+        /* We could implement it using iterator, but this will jump straight to slot of a key, therefore it's more efficient */
         TableEntry<K, V> tableWalker = table[slotIndex];
-        while (tableWalker.next != null && !tableWalker.getKey().equals(key)) {
+        // Move tableWalker until you get to the entry with the same key or end of table slot
+        while (tableWalker.next != null && !tableWalker.getKey().equals(key))
             tableWalker = tableWalker.next;
-        }
 
         return tableWalker.getKey().equals(key);
     }
@@ -184,11 +187,9 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
      * @return <code>true</code> if it contains, <code>false</code> otherwise
      */
     public boolean containsValue(Object value) {
-
-        for (TableEntry<K, V> kvTableEntry : this) {
-            if (kvTableEntry.getValue().equals(value))
+        for (TableEntry<K, V> entry : this)
+            if (entry.getValue().equals(value))
                 return true;
-        }
 
         return false;
     }
@@ -210,28 +211,33 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
             return null;
 
         TableEntry<K, V> tableWalker = table[slotIndex];
-        V oldValue = null;
+        V oldValue;
+        // Change modificationCount and size in one place because we are sure to find an Entry with this key (we called containsKey())
+        modificationCount++;
+        size--;
+
         // If Entry with given key is first in the slot
         if (tableWalker.getKey().equals(key)) {
             oldValue = tableWalker.getValue();
             table[slotIndex] = tableWalker.next;
-            modificationCount++;
-            size--;
             return oldValue;
         }
 
-        // Until we find Entry within slot. We are sure to find an Entry with this key, because we called containsKey()
-        while (tableWalker.next.getKey().equals(key)) {
+        /* Until we find Entry within slot. We are sure to find an Entry with this key, because we called containsKey().
+        tableWalker will be positioned one element before key that needs to be removed so we can change next pointers correctly. */
+        while (!tableWalker.next.getKey().equals(key))
             tableWalker = tableWalker.next;
-        }
 
-        modificationCount++;
-        size--;
-        oldValue = tableWalker.next.getValue();
-        tableWalker.next = tableWalker.next.next;
+        oldValue = tableWalker.next.getValue();     // Stores value of removed Entry
+        tableWalker.next = tableWalker.next.next;   // Pointer of element before removed is redirected to that after removed
         return oldValue;
     }
 
+    /**
+     * Returns true if HashTable is empty, false otherwise.
+     *
+     * @return true if HashTable is empty, false otherwise
+     */
     public boolean isEmpty() {
         return size == 0;
     }
@@ -239,13 +245,13 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
     /**
      * Returns elements stored in Hashtable in String format: [key1=value1, key2=value2, key3=value3]
      *
-     * @return Hashtable elements as a String
+     * @return Hashtable elements as a String in format: [key1=value1, key2=value2, key3=value3]
      */
     @Override
     public String toString() {
         Iterator<TableEntry<K, V>> elementsGetter = iterator();
-        StringBuilder sb = new StringBuilder("[");
 
+        StringBuilder sb = new StringBuilder("[");
         while (elementsGetter.hasNext()) {
             sb.append(elementsGetter.next().toString());
             if (elementsGetter.hasNext())
@@ -260,18 +266,17 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
      * Allocates new array with size equals to the size of this Hashtable, fills it with Hashtable content and returns
      * the array.
      *
-     * @return TableEntry array of Hashtable elements.
+     * @return TableEntry array of Hashtable elements
      */
     @SuppressWarnings("unchecked")
     public TableEntry<K, V>[] toArray() {
-        Iterator<TableEntry<K, V>> elementsGetter = iterator();
+        Iterator<TableEntry<K, V>> iterator = iterator();
         TableEntry<K, V>[] array = (TableEntry<K, V>[]) new TableEntry[size];
-
         int index = 0;
-        while (elementsGetter.hasNext()) {
-            array[index] = elementsGetter.next();
-            index++;
-        }
+
+        // Fills newly created array with Entries
+        while (iterator.hasNext())
+            array[index++] = iterator.next();
 
         return array;
     }
@@ -286,18 +291,14 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
         return Math.abs(key.hashCode()) % slots;
     }
 
-
     /**
-     * Helper public method (adding or removing entries from hashtable while iterating is not dealt with and will cause
-     * problem) which fetches and returns entries from hashtable.
+     * Helper public method (adding or removing entries from hashtable while iterating without using iterators method
+     * may throw an exception) which fetches and returns entries from hashtable.
      *
-     * @return new Iterator which can fetch and return SimpleHashTable TableEntries.
+     * @return new Iterator which can fetch and return SimpleHashTable TableEntries
      */
     @Override
     public Iterator<TableEntry<K, V>> iterator() {
-        /*
-        We send reference of current SimpleHashTable so private static class can "see" variables of non-static class.
-         */
         return new IteratorImpl();
     }
 
@@ -306,12 +307,12 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
      */
     private class IteratorImpl implements Iterator<TableEntry<K, V>> {
 
-        private int currentElementNo;                                   // Element no.
-        private int currentSlotIndex;                                   // Slot no.
-        private TableEntry<K, V> slotWalker;                            // Current Element
-        private boolean nextCalled;                                 // Used in remove, next must be called before calling remove
-        private K lastKey;                                    // Key of last iterated element
-        private int savedModificationCount;
+        private int currentElementNo;               // Element no.
+        private int currentSlotIndex;               // Slot no.
+        private TableEntry<K, V> slotWalker;        // Current Element
+        private boolean nextCalled;                 // Used in remove, next must be called before calling remove
+        private K lastKey;                          // Key of last iterated element
+        private int savedModificationCount;         // Initialized when instance is created, used to throw error when changing while iterating
 
         public IteratorImpl() {
             this.currentElementNo = 1;
@@ -344,24 +345,24 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
         public TableEntry<K, V> next() {
             if (savedModificationCount != SimpleHashtable.this.modificationCount)
                 throw new ConcurrentModificationException("Hashtable modified while iterating");
+            if (!hasNext())
+                throw new NoSuchElementException("No more elements in Collection ElementsGetter.");
 
-            if (hasNext()) {
-                nextCalled = true;
+            nextCalled = true;
 
-                // At start or when at the end of slot, go to next slot
-                while (slotWalker == null) {
-                    slotWalker = table[currentSlotIndex];
-                    currentSlotIndex++;
-                }
-
-                // Move walker to next entry in slot
-                TableEntry<K, V> nextTableEntry = slotWalker;
-                slotWalker = slotWalker.next;
-                currentElementNo++;
-                lastKey = nextTableEntry.getKey();
-                return nextTableEntry;
+            /* At start or when at the end of slot, go to next slot. We don't need to check if currentSlotIndex
+            will exceed number of slots in the table because method hasNext() returned true. */
+            while (slotWalker == null) {
+                slotWalker = table[currentSlotIndex];
+                currentSlotIndex++;
             }
-            throw new NoSuchElementException("No more elements in Collection ElementsGetter.");
+
+            // Move walker to next entry in slot
+            TableEntry<K, V> nextTableEntry = slotWalker;
+            slotWalker = slotWalker.next;
+            lastKey = nextTableEntry.getKey();
+            currentElementNo++;
+            return nextTableEntry;
         }
 
         /**
@@ -374,21 +375,20 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
         public void remove() {
             if (savedModificationCount != SimpleHashtable.this.modificationCount)
                 throw new ConcurrentModificationException("Hashtable modified while iterating");
+            if (!nextCalled)
+                throw new IllegalStateException("Can't call remove method in iterator if the next method hasn't yet been called," +
+                        " or the remove method has already been called after the last call to the next");
 
-            if (nextCalled) {
-                nextCalled = false;
+            nextCalled = false;
 
-                /* If there is an entry with lastKey that iterator found in next method, this iterator
-                will increase its savedModificationCount and remove entry with lastKey. This is so iterator
-                removes entry with control and doesn't throw an ConcurrentModificationException.*/
-                if (SimpleHashtable.this.containsKey(lastKey))
-                    savedModificationCount++;
+            /* If there is an entry with lastKey that iterator found in next method, this iterator
+            will increase its savedModificationCount and remove entry with lastKey. This is so iterator
+            removes entry with control and doesn't throw an ConcurrentModificationException. */
+            if (SimpleHashtable.this.containsKey(lastKey)) {
+                savedModificationCount++; // Increase iterators modificationCount so it keeps in sync with HashTable modificationCount
                 SimpleHashtable.this.remove(lastKey);
                 currentElementNo--;
-                return;
             }
-
-            throw new IllegalStateException("Can't call remove method in iterator if the next method hasn't yet been called, or the remove method has already been called after the last call to the next");
         }
 
     }

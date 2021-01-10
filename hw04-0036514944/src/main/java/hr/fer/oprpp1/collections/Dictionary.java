@@ -1,7 +1,7 @@
 package hr.fer.oprpp1.collections;
 
 /**
- * Class which has pairs of keys and values. It is implemented
+ * Class which has pairs of keys and values.
  *
  * @param <K> key type
  * @param <V> value type
@@ -9,7 +9,7 @@ package hr.fer.oprpp1.collections;
 public class Dictionary<K, V> {
 
     // variable ArrayIndexedCollection used for storing DictionaryEntry
-    private ArrayIndexedCollection<DictionaryEntry<K, V>> dictionary = new ArrayIndexedCollection<>();
+    private final ArrayIndexedCollection<DictionaryEntry<K, V>> dictionary = new ArrayIndexedCollection<>();
 
     /**
      * Private Class of Dictionary which holds a pair of key and value.
@@ -18,7 +18,7 @@ public class Dictionary<K, V> {
      * @param <V> value type
      */
     private static class DictionaryEntry<K, V> {
-        private K key;
+        private final K key;
         private V value;
 
         public DictionaryEntry(K key, V value) {

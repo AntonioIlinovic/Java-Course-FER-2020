@@ -11,8 +11,8 @@ public class SmartScriptToken {
     /**
      * Constructs new {@link SmartScriptToken} depending on {@link SmartScriptTokenType} and value.
      *
-     * @param type  of {@link SmartScriptTokenType}.
-     * @param value of this {@link SmartScriptToken}.
+     * @param type  of {@link SmartScriptTokenType}
+     * @param value of this {@link SmartScriptToken}
      */
     public SmartScriptToken(SmartScriptTokenType type, Object value) {
         this.type = type;
@@ -21,7 +21,8 @@ public class SmartScriptToken {
 
     /**
      * Getter for Object value.
-     * @return Object value.
+     *
+     * @return Object value
      */
     public Object getValue() {
         return value;
@@ -29,7 +30,8 @@ public class SmartScriptToken {
 
     /**
      * Getter for {@link SmartScriptTokenType} type.
-     * @return {@link SmartScriptTokenType} type.
+     *
+     * @return {@link SmartScriptTokenType} type
      */
     public SmartScriptTokenType getTokenType() {
         return type;
@@ -37,7 +39,8 @@ public class SmartScriptToken {
 
     /**
      * toString method for {@link SmartScriptToken} in desired format.
-     * @return SmartScriptToken as a String.
+     *
+     * @return SmartScriptToken as a String
      */
     @Override
     public String toString() {

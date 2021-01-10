@@ -285,9 +285,7 @@ public class ArrayIndexedCollection implements List {
      */
     @Override
     public ElementsGetter createElementsGetter() {
-        /*
-        We send reference of current Collection so private static class can "see" variables of non-static class.
-         */
+        // We send reference of current Collection so private static class can "see" variables of non-static class.
         return new ArrayIndexedCollectionElementsGetter(this, modificationCount);
     }
 

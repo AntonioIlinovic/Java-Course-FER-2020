@@ -9,7 +9,8 @@ public class ElementOperator extends Element {
 
     /**
      * Constructor for {@link ElementOperator}.
-     * @param symbol String to initialize {@link ElementOperator} with.
+     *
+     * @param symbol String to initialize {@link ElementOperator} with
      */
     public ElementOperator(String symbol) {
         this.symbol = symbol;
@@ -17,6 +18,7 @@ public class ElementOperator extends Element {
 
     /**
      * Getter for String symbol.
+     *
      * @return String symbol
      */
     public String getSymbol() {
@@ -24,7 +26,7 @@ public class ElementOperator extends Element {
     }
 
     /**
-     * @return Operator in String format.
+     * @return Operator in String format
      */
     @Override
     public String asText() {

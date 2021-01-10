@@ -9,7 +9,8 @@ public class ElementString extends Element {
 
     /**
      * Constructor for {@link ElementString}.
-     * @param value String to initialize {@link ElementString} with.
+     *
+     * @param value String to initialize {@link ElementString} with
      */
     public ElementString(String value) {
         this.value = value;
@@ -17,6 +18,7 @@ public class ElementString extends Element {
 
     /**
      * Getter for String value.
+     *
      * @return String value
      */
     public String getValue() {
@@ -24,7 +26,7 @@ public class ElementString extends Element {
     }
 
     /**
-     * @return String in String format.
+     * @return String in String format
      */
     @Override
     public String asText() {

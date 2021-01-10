@@ -16,19 +16,11 @@ import hr.fer.oprpp1.custom.scripting.nodes.*;
  */
 public class SmartScriptParser {
 
-    /**
-     * Lexer (tokenizer) of source code.
-     */
-    private SmartScriptLexer tokenizer;
-    /**
-     * Tree which represents parsed program.
-     */
-    private DocumentNode documentNode;
-    /**
-     * ObjectStack which will help for tree construction. At the start of parsing, DocumentNode is pushed to it. Then,
-     * for each empty tag or text node we create that tag/node and add it as a child of Node that was last pushed on the
-     * stack.
-     */
+    private final SmartScriptLexer tokenizer;       // Lexer (tokenizer) of source code.
+    private DocumentNode documentNode;              // Tree which represents parsed program.
+    /* ObjectStack which will help for tree construction. At the start of parsing, DocumentNode is pushed to it. Then,
+       for each empty tag or text node we create that tag/node and add it as a child of Node that was last pushed on the
+       stack. */
     private ObjectStack treeStack;
 
     /**
@@ -38,13 +30,14 @@ public class SmartScriptParser {
      * allows us to later add different constructors that will retrieve documents by various means and delegate the
      * parsing to the same method.
      *
-     * @param text program text which will be tokenized and parsed.
-     * @throws hr.fer.oprpp1.custom.scripting.lexer.SmartScriptLexerException in case of error in tokenizing.
-     * @throws SmartScriptParserException                                     in case of error in parsing.
+     * @param text program text which will be tokenized and parsed
+     * @throws SmartScriptLexerException  in case of error in tokenizing
+     * @throws SmartScriptParserException in case of error in parsing
      */
     public SmartScriptParser(String text) {
         if (text == null)
             throw new SmartScriptLexerException("Text of program can't be empty");
+
         this.tokenizer = new SmartScriptLexer(text);
         try {
             documentNode = parse();
@@ -56,29 +49,27 @@ public class SmartScriptParser {
     /**
      * Getter for tree made by parsing source code.
      *
-     * @return program tree.
+     * @return program tree
      */
     public DocumentNode getDocumentNode() {
         return documentNode;
     }
 
     /**
-     * Helper method which check if current token is of given type.
+     * Helper method which returns TokenType of current Token.
      *
-     * @param type type of token by which it is compared.
-     * @return <code>true</code> if it is, <code>false</code> otherwise.
+     * @return TokenType of current Token
      */
-    private boolean isTokenOfType(SmartScriptTokenType type) {
-        return tokenizer.getToken().getTokenType() == type;
+    private SmartScriptTokenType getCurrentTokenType() {
+        return tokenizer.getToken().getTokenType();
     }
 
     /**
      * Helper method which is an parser implementation by recursive descent.
      *
-     * @return program tree.
+     * @return program tree
      */
     private DocumentNode parse() {
-        // TODO Parser should change state of Lexer. Lexer shouldn't change its state.
         documentNode = new DocumentNode();
         treeStack = new ObjectStack();
         /* At the start documentNode is pushed to the stack. Then, for each empty tag ('=' tag is an empty tag)
@@ -87,34 +78,25 @@ public class SmartScriptParser {
            pushed on the stack and then push this FOR-node to the stack. Now all nodes following will be added
            as children of this FOR-node. The exception is {$END$}. When you encounter it, simple pop one entry
            from the stack. If stack remains empty, there is error in document - it contains more {$END$}-s
-           than opened non-empty tags, so throw an exception. **/
+           than opened non-empty tags, so throw an exception. */
         treeStack.push(documentNode);
-
-        /* Generate first token at the start of the parsing. */
+        // Generate first token at the start of the parsing
         tokenizer.nextToken();
 
-        /* Add all nodes in program to DocumentNode and return it. */
-        while (true) {
-            /* EOF: if at the end of program, we are done. */
-            if (isTokenOfType(SmartScriptTokenType.EOF)) {
-                break;
-            }
+        // Add all nodes in program (until you get token of type EOF) to DocumentNode and return it
+        while (getCurrentTokenType() != SmartScriptTokenType.EOF) {
 
-            /* TAGSTART: if at the start of a tag parse it as a tag. */
-            if (isTokenOfType(SmartScriptTokenType.TAGSTART)) {
+            if (getCurrentTokenType() == SmartScriptTokenType.TAGSTART) {
+                // TAGSTART: if at the start of a tag parse it as a tag
                 tokenizer.setState(SmartScriptLexerState.TAG);
                 tokenizer.nextToken();
                 parseTag();
-            }
-
-            /* TAGEND: if at the end of a tag, just generate next token. */
-            if (isTokenOfType(SmartScriptTokenType.TAGEND)) {
+            } else if (getCurrentTokenType() == SmartScriptTokenType.TAGEND) {
+                // TAGEND: if at the end of a tag, just generate next token
                 tokenizer.setState(SmartScriptLexerState.TEXT);
                 tokenizer.nextToken();
-            }
-
-            /* TEXT: add it to last object on the stack as a child. */
-            if (isTokenOfType(SmartScriptTokenType.TEXT)) {
+            } else if (getCurrentTokenType() == SmartScriptTokenType.TEXT) {
+                /* TEXT: add it to last object on the stack as a child. */
                 String text = tokenizer.getToken().getValue().toString();
                 TextNode textNode = new TextNode(text);
 
@@ -124,7 +106,7 @@ public class SmartScriptParser {
             }
         }
 
-        /* There must be exactly one element on stack at the end of parsing, DocumentNode. */
+        // There must be exactly one element on stack at the end of parsing (DocumentNode)
         if (treeStack.size() != 1)
             throw new SmartScriptParserException("Your document must have exactly one closing tag for each non-empty tag");
         return documentNode;
@@ -135,7 +117,7 @@ public class SmartScriptParser {
      */
     private void parseTag() {
         /* We check which type of tag it is, and depending on that call its method. */
-        if (isTokenOfType(SmartScriptTokenType.TAGNAME)) {
+        if (getCurrentTokenType() == SmartScriptTokenType.TAGNAME) {
             String tagname = tokenizer.getToken().getValue().toString();
 
             if (tagname.equals("=")) {
@@ -165,55 +147,53 @@ public class SmartScriptParser {
      */
     private void parseEmptyTag() {
         /* This array will store all elements that are to be stored in EchoNode. Just before we put that
-        EchoNode to the last object on stack as a child, convert it to Elements[].
-         */
+        EchoNode to the last object on stack as a child, convert it to Elements[]. */
         ArrayIndexedCollection elements = new ArrayIndexedCollection();
 
         /* Get tokens until you get to the end of the tag. */
-        while (!isTokenOfType(SmartScriptTokenType.TAGEND)) {
+        while (getCurrentTokenType() != SmartScriptTokenType.TAGEND) {
 
-            if (isTokenOfType(SmartScriptTokenType.VARIABLE)) {
+            if (getCurrentTokenType() == SmartScriptTokenType.VARIABLE) {
                 /* VARIABLE: make new ElementVariable, and add it to elements. */
                 String variableName = tokenizer.getToken().getValue().toString();
                 ElementVariable elementVariable = new ElementVariable(variableName);
                 elements.add(elementVariable);
             }
-            if (isTokenOfType(SmartScriptTokenType.OPERATOR)) {
+            if (getCurrentTokenType() == SmartScriptTokenType.OPERATOR) {
                 /* OPERATOR: make new ElementOperator, and add it to elements. */
                 String operatorName = tokenizer.getToken().getValue().toString();
                 ElementOperator elementOperator = new ElementOperator(operatorName);
                 elements.add(elementOperator);
             }
-            if (isTokenOfType(SmartScriptTokenType.FUNCTION)) {
+            if (getCurrentTokenType() == SmartScriptTokenType.FUNCTION) {
                 /* FUNCTION: make new ElementFunction, and add it to elements. */
                 String functionName = tokenizer.getToken().getValue().toString();
                 ElementFunction elementFunction = new ElementFunction(functionName);
                 elements.add(elementFunction);
             }
-            if (isTokenOfType(SmartScriptTokenType.STRING)) {
+            if (getCurrentTokenType() == SmartScriptTokenType.STRING) {
                 /* STRING: make new ElementString, and add it to elements. */
                 String string = tokenizer.getToken().getValue().toString();
                 ElementString elementString = new ElementString(string);
                 elements.add(elementString);
             }
-            if (isTokenOfType(SmartScriptTokenType.INTEGER)) {
+            if (getCurrentTokenType() == SmartScriptTokenType.INTEGER) {
                 /* INTEGER: make new ElementInteger, and add it to elements. */
                 int anInt = Integer.parseInt(tokenizer.getToken().getValue().toString());
                 ElementConstantInteger elementConstantInteger = new ElementConstantInteger(anInt);
                 elements.add(elementConstantInteger);
             }
-            if (isTokenOfType(SmartScriptTokenType.DOUBLE)) {
+            if (getCurrentTokenType() == SmartScriptTokenType.DOUBLE) {
                 /* DOUBLE: make new ElementDouble, and add it to elements. */
                 double aDouble = Double.parseDouble(tokenizer.getToken().getValue().toString());
                 ElementConstantDouble elementConstantDouble = new ElementConstantDouble(aDouble);
                 elements.add(elementConstantDouble);
             }
 
-            /* Get next token. */
             tokenizer.nextToken();
         }
 
-        /* Copy from ArrayIndexedCollection to Element[] */
+        // Copy from ArrayIndexedCollection to Element[]
         Element[] echoNodeElements = new Element[elements.size()];
         for (int index = 0; index < elements.size(); index++)
             echoNodeElements[index] = (Element) elements.get(index);
@@ -225,12 +205,12 @@ public class SmartScriptParser {
     }
 
     /**
-     * Add 3 or 4 elements to one ForLoopNode. Then add that ForLoopNode to the last object on stack.
-     * Lastly push this ForLoopNode on stack.
+     * Add 3 or 4 elements to one ForLoopNode. Then add that ForLoopNode to the last object on stack. Lastly push this
+     * ForLoopNode on stack.
      */
     private void parseForLoop() {
         /* First Element of for loop must be of type ElementVariable. */
-        if (!isTokenOfType(SmartScriptTokenType.VARIABLE))
+        if (getCurrentTokenType() != SmartScriptTokenType.VARIABLE)
             throw new SmartScriptParserException("First Element of for loop must be of type ElementVariable");
         String variableName = tokenizer.getToken().getValue().toString();
         ElementVariable first = new ElementVariable(variableName);
@@ -244,13 +224,13 @@ public class SmartScriptParser {
 
         Element fourth = null;
         /* Check if there is 4th optional for loop argument. */
-        if (!isTokenOfType(SmartScriptTokenType.TAGEND)) {
+        if (getCurrentTokenType() != SmartScriptTokenType.TAGEND) {
             fourth = createNewElementOfCorrectType();
             tokenizer.nextToken();
         }
 
         /* For loop must have 3 or 4 arguments. So current tag must be TAGEND. */
-        if (!isTokenOfType(SmartScriptTokenType.TAGEND))
+        if (getCurrentTokenType() != SmartScriptTokenType.TAGEND)
             throw new SmartScriptParserException("For loop must accept 3 or 4 arguments");
 
         ForLoopNode forLoopNode = new ForLoopNode(first, second, third, fourth);
@@ -261,35 +241,36 @@ public class SmartScriptParser {
 
     /**
      * Helper method which creates Element of correct type, depending on current token type.
+     *
      * @return Element of correct type.
      */
     private Element createNewElementOfCorrectType() {
-        if (isTokenOfType(SmartScriptTokenType.VARIABLE)) {
+        if (getCurrentTokenType() == SmartScriptTokenType.VARIABLE) {
             /* VARIABLE: make new ElementVariable. */
             String variableName = tokenizer.getToken().getValue().toString();
             return new ElementVariable(variableName);
         }
-        if (isTokenOfType(SmartScriptTokenType.OPERATOR)) {
+        if (getCurrentTokenType() == SmartScriptTokenType.OPERATOR) {
             /* OPERATOR: make new ElementOperator. */
             String operatorName = tokenizer.getToken().getValue().toString();
             return new ElementOperator(operatorName);
         }
-        if (isTokenOfType(SmartScriptTokenType.FUNCTION)) {
+        if (getCurrentTokenType() == SmartScriptTokenType.FUNCTION) {
             /* FUNCTION: make new ElementFunction. */
             String functionName = tokenizer.getToken().getValue().toString();
             return new ElementFunction(functionName);
         }
-        if (isTokenOfType(SmartScriptTokenType.STRING)) {
+        if (getCurrentTokenType() == SmartScriptTokenType.STRING) {
             /* STRING: make new ElementString. */
             String string = tokenizer.getToken().getValue().toString();
             return new ElementString(string);
         }
-        if (isTokenOfType(SmartScriptTokenType.INTEGER)) {
+        if (getCurrentTokenType() == SmartScriptTokenType.INTEGER) {
             /* INTEGER: make new ElementInteger. */
             int anInt = Integer.parseInt(tokenizer.getToken().getValue().toString());
             return new ElementConstantInteger(anInt);
         }
-        if (isTokenOfType(SmartScriptTokenType.DOUBLE)) {
+        if (getCurrentTokenType() == SmartScriptTokenType.DOUBLE) {
             /* DOUBLE: make new ElementDouble. */
             double aDouble = Double.parseDouble(tokenizer.getToken().getValue().toString());
             return new ElementConstantDouble(aDouble);

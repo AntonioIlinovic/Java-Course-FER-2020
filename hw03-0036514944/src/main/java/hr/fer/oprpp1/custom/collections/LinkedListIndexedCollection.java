@@ -226,8 +226,8 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 
     /**
      * @param value to remove from Collection.
-     * @return boolean <code>true</code> only if the Collection contains given value as determined by <code>equals</code> method
-     *      * and removes one occurrence of it.
+     * @return boolean <code>true</code> only if the Collection contains given value as determined by
+     * <code>equals</code> method and removes one occurrence of it.
      */
     @Override
     public boolean remove(Object value) {
@@ -289,9 +289,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
      */
     @Override
     public ElementsGetter<T> createElementsGetter() {
-        /*
-        We send reference of current Collection so private static class can "see" variables of non-static class.
-         */
+        // We send reference of current Collection so private static class can "see" variables of non-static class.
         return new LinkedListIndexedCollectionElementsGetter<T>(this, modificationCount);
     }
 
@@ -301,26 +299,40 @@ public class LinkedListIndexedCollection<T> implements List<T> {
     private static class LinkedListIndexedCollectionElementsGetter<T> implements ElementsGetter<T> {
 
         private final LinkedListIndexedCollection<T> collectionReference;
-        private int currentElementIndex = 0;
+        private ListNode<T> currentNode;
         private final long savedModificationCount;
 
         public LinkedListIndexedCollectionElementsGetter(LinkedListIndexedCollection<T> collectionReference, long savedModificationCount) {
             this.collectionReference = collectionReference;
+            this.currentNode = collectionReference.first;
             this.savedModificationCount = savedModificationCount;
         }
 
+        /**
+         * Checks if {@link LinkedListIndexedCollectionElementsGetter} has next element.
+         *
+         * @return <code>true</code> if {@link LinkedListIndexedCollectionElementsGetter} has next element,
+         * <code>false</code> otherwise
+         */
         @Override
         public boolean hasNextElement() {
             if (savedModificationCount != collectionReference.modificationCount)
                 throw new ConcurrentModificationException("Collection changed while ElementsGetter is in use.");
-            return currentElementIndex < collectionReference.size;
+            return currentNode != null;
         }
 
+        /**
+         * Returns next element of {@link LinkedListIndexedCollectionElementsGetter}.
+         *
+         * @return next element of {@link LinkedListIndexedCollectionElementsGetter}
+         */
         @Override
         public T getNextElement() {
-            if (hasNextElement())
-                return collectionReference.get(currentElementIndex++);
-            throw new NoSuchElementException("No more elements in Collection ElementsGetter.");
+            if (!hasNextElement())
+                throw new NoSuchElementException("No more elements in Collection ElementsGetter.");
+            T value = currentNode.value;
+            currentNode = currentNode.next;
+            return value;
         }
 
     }

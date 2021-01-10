@@ -1,21 +1,19 @@
 package hr.fer.oprpp1.custom.collections;
 
 /**
- * Implementation of resizable array-backed collection of objects. Duplicate elements <b>are allowed</b>, storage of
- * null references
- * <b>is not allowed</b>.
+ * Implementation of resizable array-backed collection of objects. Duplicate elements <b>are allowed</b>,
+ * storage of null references <b>is not allowed</b>.
  */
 public class ArrayIndexedCollection extends Collection {
 
-    private int size;
-    private Object[] elements;
+    private int size;           // Current size of collection (number of elements actually stored in elements array)
+    private Object[] elements;  // An array of object references which length is determined by capacity variable
     private final static int DEFAULT_CAPACITY = 16;
 
     /**
      * Default constructor. Size of array is set to default value.
      */
     public ArrayIndexedCollection() {
-
         this(DEFAULT_CAPACITY);
     }
 

@@ -1,7 +1,5 @@
 package hr.fer.oprpp1.custom.collections;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
@@ -83,6 +81,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 
     /**
      * Returns number of allocated places for elements.
+     *
      * @return number of allocated places for elements
      */
     public int getAllocatedSize() {
@@ -158,7 +157,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
         Object[] array = new Object[size];
 
         if (size >= 0) {
-            System.arraycopy((Object[])elements, 0, array, 0, size);
+            System.arraycopy((Object[]) elements, 0, array, 0, size);
         }
 
         return array;
@@ -285,7 +284,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
             throw new IndexOutOfBoundsException(
                     "Index must be between 0 and " + (size - 1) + ". Yours was " + index + ".");
 
-        if (index != size -1) {
+        if (index != size - 1) {
             for (index = index + 1; index <= size; index++) {
                 elements[index - 1] = elements[index];
             }
@@ -301,9 +300,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
      */
     @Override
     public ElementsGetter<T> createElementsGetter() {
-        /*
-        We send reference of current Collection so private static class can "see" variables of non-static class.
-         */
+        // We send reference of current Collection so private static class can "see" variables of non-static class.
         return new ArrayIndexedCollectionElementsGetter<T>(this, modificationCount);
     }
 
@@ -321,6 +318,12 @@ public class ArrayIndexedCollection<T> implements List<T> {
             this.savedModificationCount = savedModificationCount;
         }
 
+        /**
+         * Checks if {@link ArrayIndexedCollectionElementsGetter} has next element.
+         *
+         * @return <code>true</code> if {@link ArrayIndexedCollectionElementsGetter} has next element,
+         * <code>false</code> otherwise
+         */
         @Override
         public boolean hasNextElement() {
             if (savedModificationCount != collectionReference.modificationCount)
@@ -328,6 +331,11 @@ public class ArrayIndexedCollection<T> implements List<T> {
             return currentElementIndex < collectionReference.size;
         }
 
+        /**
+         * Returns next element of {@link ArrayIndexedCollectionElementsGetter}.
+         *
+         * @return next element of {@link ArrayIndexedCollectionElementsGetter}
+         */
         @Override
         public T getNextElement() {
             if (hasNextElement())

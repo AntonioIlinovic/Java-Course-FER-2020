@@ -5,6 +5,9 @@ package hr.fer.oprpp1.custom.collections;
  */
 public class Collection {
 
+    /**
+     * Protected default constructor.
+     */
     protected Collection() {
 
     }
@@ -56,8 +59,7 @@ public class Collection {
 
     /**
      * Allocates new array with size equals to the size of this collections, fills it with collection content and
-     * returns the array. This method never returns
-     * <code>null</code>.
+     * returns the array. This method never returns <code>null</code>.
      *
      * @return Collection converted to <code>Object</code> array.
      */

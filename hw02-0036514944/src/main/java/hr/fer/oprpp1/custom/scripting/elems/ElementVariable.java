@@ -9,7 +9,8 @@ public class ElementVariable extends Element {
 
     /**
      * Constructor for {@link ElementVariable}.
-     * @param name String to initialize {@link ElementVariable} with.
+     *
+     * @param name String to initialize {@link ElementVariable} with
      */
     public ElementVariable(String name) {
         this.name = name;
@@ -17,6 +18,7 @@ public class ElementVariable extends Element {
 
     /**
      * Getter for String name.
+     *
      * @return String name
      */
     public String getName() {
@@ -24,7 +26,7 @@ public class ElementVariable extends Element {
     }
 
     /**
-     * @return Variable in String format.
+     * @return Variable in String format
      */
     @Override
     public String asText() {

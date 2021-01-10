@@ -1,7 +1,7 @@
 package hr.fer.oprpp1.collections;
 
 /**
- * Interface which defines methods needed for a List.
+ * Class which is more specific than Collection, thus it has more methods..
  * Parametrized by T.
  */
 public interface List<T> extends Collection<T> {

@@ -14,10 +14,11 @@ public class RotateCommand implements Command {
 
     private double angle;
 
-    // TODO Delete this. This is a method used if you want more randomness in your fractal
+    /* // Delete this. This is a method used if you want more randomness in your fractal
     private int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
     }
+     */
 
     public RotateCommand(double angle) {
         //this.angle = angle + getRandomNumber(-10, 10); // This is for more randomness in your fractal

@@ -156,6 +156,4 @@ public class LinkedListIndexedCollectionTest {
         assertThrows(RuntimeException.class, () -> list.remove(0));
     }
 
-    // TODO Add more tests (ElementsGetter, Tester, Processor with super and sub classes)
-
 }

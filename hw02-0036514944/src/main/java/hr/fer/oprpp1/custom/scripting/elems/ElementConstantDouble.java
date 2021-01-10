@@ -9,7 +9,8 @@ public class ElementConstantDouble extends Element {
 
     /**
      * Constructor for {@link ElementConstantDouble}.
-     * @param value double to initialize {@link ElementConstantDouble} with.
+     *
+     * @param value double to initialize {@link ElementConstantDouble} with
      */
     public ElementConstantDouble(double value) {
         this.value = value;
@@ -17,6 +18,7 @@ public class ElementConstantDouble extends Element {
 
     /**
      * Getter for double value.
+     *
      * @return double value
      */
     public double getValue() {
@@ -24,7 +26,7 @@ public class ElementConstantDouble extends Element {
     }
 
     /**
-     * @return ConstantDouble in String format.
+     * @return ConstantDouble in String format
      */
     @Override
     public String asText() {

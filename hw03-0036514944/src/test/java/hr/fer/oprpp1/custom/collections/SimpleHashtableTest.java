@@ -101,6 +101,17 @@ public class SimpleHashtableTest {
     }
 
     @Test
+    public void testInsertMethodAtStartTwoWithSameKey() {
+        SimpleHashtable<String, Integer> examMarks = new SimpleHashtable<>();
+
+        examMarks.put("Ivana", 5);
+        examMarks.put("Ivana", 3);
+
+        assertEquals(1, examMarks.size());
+        assertEquals(3, examMarks.get("Ivana"));
+    }
+
+    @Test
     public void testIteratorRemovingSafelyWithIterator() {
         SimpleHashtable<String, Integer> examMarks = new SimpleHashtable<>(2);
 
@@ -271,27 +282,37 @@ public class SimpleHashtableTest {
         testTable.put("Josip", 100);
 
         testTable.remove("Ivana");
+        testTable.remove("Josip");
 
         assertFalse(testTable.containsKey("Ivana"));
         assertTrue(testTable.containsKey("Jasna"));
-        assertTrue(!testTable.containsKey("Joža"));
+        assertFalse(testTable.containsKey("Joža"));
+        assertFalse(testTable.containsKey("Josip"));
     }
 
     @Test
-    public void testRemoveElement2() {
-        SimpleHashtable<String, Integer> testTable = new SimpleHashtable<>(2);
+    public void testRemoveElementMultipleInSlot() {
+        SimpleHashtable<String, Integer> testTable = new SimpleHashtable<>(8);
 
-        testTable.put("Ivana", 2);
-        testTable.put("Ante", 2);
-        testTable.put("Jasna", 2);
-        testTable.put("Kristina", 2);
-        testTable.put("Ivana", 5); // overwrites old grade for Ivana
-        testTable.put("Josip", 100);
+        testTable.put("Ana", 1);
+        testTable.put("Alen", 2);
+        testTable.put("Dunja", 3);
+        testTable.put("File", 4);
+        testTable.put("Program", 5);
 
-        testTable.remove("Ante");
+        testTable.remove("Ana");
+        testTable.remove("Program");
+        testTable.remove("Dunja");
 
-        assertFalse(testTable.containsKey("Ante"));
-        assertTrue(testTable.containsKey("Ivana"));
+        assertTrue(testTable.containsKey("Alen"));
+        assertTrue(testTable.containsKey("File"));
+        assertFalse(testTable.containsKey("Ana"));
+        assertFalse(testTable.containsKey("Dunja"));
+        assertFalse(testTable.containsKey("Program"));
+    }
+
+    private int calculateSlot(Object key, int slots) {
+        return Math.abs(key.hashCode()) % slots;
     }
 
     @Test

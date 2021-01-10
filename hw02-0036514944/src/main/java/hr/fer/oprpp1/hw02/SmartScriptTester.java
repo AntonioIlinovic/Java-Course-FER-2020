@@ -14,10 +14,7 @@ public class SmartScriptTester {
 
         String filepath = "src/test/resources/extra/primjer10.txt";
 
-        String docBody = new String(
-                Files.readAllBytes(Paths.get(filepath)),
-                StandardCharsets.UTF_8
-        );
+        String docBody = Files.readString(Paths.get(filepath));
         SmartScriptParser parser = null;
         try {
             parser = new SmartScriptParser(docBody);

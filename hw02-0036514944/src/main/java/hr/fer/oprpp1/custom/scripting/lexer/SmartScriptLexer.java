@@ -67,16 +67,15 @@ public class SmartScriptLexer {
     private SmartScriptLexerState state;        // State of a lexer
 
     /**
-     * Construtor for {@link SmartScriptLexer}.
+     * Constructor for {@link SmartScriptLexer}.
      *
-     * @param text String to initialize {@link SmartScriptLexer} with.
+     * @param text String to initialize {@link SmartScriptLexer} with
      */
     public SmartScriptLexer(String text) {
         data = text.toCharArray();
         currentIndex = 0;
         state = SmartScriptLexerState.TEXT;
     }
-
 
     /**
      * Generates and returns next {@link SmartScriptToken}.
@@ -85,40 +84,35 @@ public class SmartScriptLexer {
      * @throws SmartScriptLexerException if there is error in lexical analyzation.
      */
     public SmartScriptToken nextToken() {
-        /*
-        If user requests next token and before that Lexer returned token EOF, an exception is thrown.
-         */
+        // If user requests next token and before that Lexer returned token EOF, an exception is thrown
         if (token != null && token.getTokenType() == SmartScriptTokenType.EOF)
             throw new SmartScriptLexerException("Requesting next token, but all tokens were exhausted.");
 
         StringBuilder tokenBuilder = new StringBuilder();   // Used to build next token by appending chars to it.
 
-        /*
-        If lexer is at the end of text return EOF.
-         */
+        // If lexer is at the end of text return EOF
         if (!hasMoreData()) {
             token = new SmartScriptToken(SmartScriptTokenType.EOF, null);
             return token;
         }
 
         // Depending in which state Lexer is, analyze that type of tokens.
-        if (state == SmartScriptLexerState.TEXT) // TEXT state
+        if (state == SmartScriptLexerState.TEXT)    // TEXT state
             return lexerText(tokenBuilder);
-        else // TAG state
-        {
+        else {                                      // TAG state
             skipBlanks();
             return lexerTag(tokenBuilder);
         }
     }
 
-    /* Analyze tokens in TEXT state. */
+    /**
+     * Helper method which analyzes tokens in TEXT state.
+     */
     private SmartScriptToken lexerText(StringBuilder tokenBuilder) {
-        /*
-        First check if TAGSTART is at the beginning. If it is, return TAGSTART token and switch to TAG state.
-        Implemented so it checks if current character is '{'. If it is check if next character is '$'.
-        If then first 2 characters are '{$' return TAGSTART. Otherwise go back at index when you entered this method
-        and analyze it as a STRING.
-         */
+        /* First check if TAGSTART is at the beginning. If it is, return TAGSTART token and switch to TAG state.
+           Implemented so it checks if current character is '{'. If it is, check if next character is '$'.
+           If then first 2 characters are '{$' return TAGSTART. Otherwise go back at index when you entered this method
+           and analyze it as a STRING. */
         if (hasMoreData() && currentChar() == '{') {
             if (nextIthCharEquals('$', 1)) {
                 currentIndex += 2;      // Move index 2 places because length of "{$" is equal to 2
@@ -136,20 +130,20 @@ public class SmartScriptLexer {
         boolean escaped = false;        // If last char was escape char '\'
 
 
-        /* Go through text and build token until you find TAGSTART '{$' */
+        // Go through text and build token until you find TAGSTART '{$'
         while (hasMoreData()) {
-            /* First check if last char was escape char '\' */
+            // First check if last char was escape char '\'
             if (escaped) {
                 escaped = false;
 
                 if (currentChar() == '\\' || currentChar() == '{') {
                     tokenBuilder.append(currentChar());
                     currentIndex++;
-                } else {
+                } else
                     throw new SmartScriptLexerException("Escaping error, you can't have " + currentChar() + " as escaped character in TEXT mode");
-                }
+
             } else {
-                /* If it is not escaped first check for TAGSTART. */
+                // If it is not escaped first check for TAGSTART
                 if (currentChar() == '{') {
                     if (nextIthCharEquals('$', 1)) {
                         break;
@@ -169,13 +163,14 @@ public class SmartScriptLexer {
         if (escaped)
             throw new SmartScriptLexerException("Escaping error, you can't finish your text with just an escape character '\\'");
 
-
         token = new SmartScriptToken(SmartScriptTokenType.TEXT, tokenBuilder.toString());
         return token;
     }
 
 
-    /* Analyze tokens in TAG state. */
+    /**
+     * Helper method which analyzes tokens in TAG state.
+     */
     private SmartScriptToken lexerTag(StringBuilder tokenBuilder) {
         // TAGEND tag
         if (currentChar() == '$') {
@@ -187,25 +182,10 @@ public class SmartScriptLexer {
         }
 
         // FUNCTION tag
-        /*
-        Valid function name starts with @ after which follows a letter and after than can follow zero or more letters,
-        digits or underscores. If function name is not valid, it is invalid.
-         */
+        /* Valid function name starts with @ after which follows a letter and after than can follow zero or more letters,
+        digits or underscores. If function name is not valid, it is invalid. */
         if (currentChar() == '@') {
             currentIndex++;
-
-            if (hasMoreData() && Character.isLetter(currentChar())) {
-                tokenBuilder.append(currentChar());
-                currentIndex++;
-            } else {
-                throw new SmartScriptLexerException("Function name must start with a letter");
-            }
-
-            while (hasMoreData() &&
-                    (Character.isLetter(currentChar())) || Character.isDigit(currentChar()) || currentChar() == '_') {
-                tokenBuilder.append(currentChar());
-                currentIndex++;
-            }
 
             token = new SmartScriptToken(SmartScriptTokenType.FUNCTION, tokenBuilder.toString());
             return token;
@@ -268,7 +248,6 @@ public class SmartScriptLexer {
                 if (escaped) {
                     escaped = false;
 
-                    // TODO Convert if, else if, else to switch
                     if (currentChar() == '\\')
                         tokenBuilder.append("\\");
                     else if (currentChar() == '"')
@@ -397,6 +376,28 @@ public class SmartScriptLexer {
         return token;
     }
 
+    /**
+     * Helper method which returns new Token of type Function.
+     *
+     * @param tokenBuilder used to build Token
+     * @return Token of type Function
+     */
+    private SmartScriptToken getFunctionToken(StringBuilder tokenBuilder) {
+        if (hasMoreData() && Character.isLetter(currentChar())) {
+            tokenBuilder.append(currentChar());
+            currentIndex++;
+        } else {
+            throw new SmartScriptLexerException("Function name must start with a letter");
+        }
+
+        while (hasMoreData() &&
+                (Character.isLetter(currentChar())) || Character.isDigit(currentChar()) || currentChar() == '_') {
+            tokenBuilder.append(currentChar());
+            currentIndex++;
+        }
+
+        return new SmartScriptToken(SmartScriptTokenType.FUNCTION, tokenBuilder.toString());
+    }
 
     /**
      * Returns last generated {@link SmartScriptToken}. Can be called multiple times. Does not generate next {@link

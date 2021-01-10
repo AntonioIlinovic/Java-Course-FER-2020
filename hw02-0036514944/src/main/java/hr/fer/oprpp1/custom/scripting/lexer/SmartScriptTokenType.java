@@ -5,27 +5,27 @@ package hr.fer.oprpp1.custom.scripting.lexer;
  */
 public enum SmartScriptTokenType {
 
-    /** Signifies there is no more tokens **/
+    // Signifies there is no more tokens
     EOF,
-    /** Text **/
+    // Text
     TEXT,
-    /** Keyword: (FOR, END, =) **/
+    // Keyword: (FOR, END, =)
     TAGNAME,
-    /** Variable **/
+    // Variable
     VARIABLE,
-    /** Function **/
+    // Function
     FUNCTION,
-    /** Operator **/
+    // Operator
     OPERATOR,
-    /** Integer **/
+    // Integer
     INTEGER,
-    /** Double **/
+    // Double
     DOUBLE,
-    /** String **/
+    // String
     STRING,
-    /** Signifies start of a tag **/
+    // Signifies start of a tag
     TAGSTART,
-    /** Signifies end of a tag **/
+    // Signifies end of a tag
     TAGEND
 
 }

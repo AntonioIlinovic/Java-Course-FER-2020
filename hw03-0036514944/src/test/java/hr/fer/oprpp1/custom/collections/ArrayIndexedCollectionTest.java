@@ -155,7 +155,5 @@ public class ArrayIndexedCollectionTest {
 		ArrayIndexedCollection<Integer> array = getIntegerArrayWithFiveElements();
 		assertEquals(-1, array.indexOf(10));
 	}
-
-	// TODO Add more tests (ElementsGetter, Tester, Processor with super and sub classes)
 	
 }

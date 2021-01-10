@@ -9,7 +9,8 @@ public class ElementFunction extends Element {
 
     /**
      * Constructor for {@link ElementFunction}.
-     * @param name String to initialize {@link ElementFunction} with.
+     *
+     * @param name String to initialize {@link ElementFunction} with
      */
     public ElementFunction(String name) {
         this.name = name;
@@ -17,6 +18,7 @@ public class ElementFunction extends Element {
 
     /**
      * Getter for String name.
+     *
      * @return String name
      */
     public String getName() {
@@ -24,7 +26,7 @@ public class ElementFunction extends Element {
     }
 
     /**
-     * @return Function in String format.
+     * @return Function in String format
      */
     @Override
     public String asText() {

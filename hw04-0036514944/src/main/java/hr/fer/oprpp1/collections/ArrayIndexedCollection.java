@@ -12,8 +12,8 @@ import java.util.NoSuchElementException;
  */
 public class ArrayIndexedCollection<T> implements List<T> {
 
-    private int size;
-    private T[] elements;
+    private int size;           // Current size of collection (number of elements actually stored; number of nodes in list)
+    private T[] elements;       // Array in which elements are stored internally
     private final static int DEFAULT_CAPACITY = 16;
     /*
      Counts how many times this Collection structure has been modified.
@@ -77,6 +77,15 @@ public class ArrayIndexedCollection<T> implements List<T> {
         elements = (T[]) new Object[biggerInitialCapacity];
 
         this.addAll(other);
+    }
+
+    /**
+     * Returns number of allocated places for elements.
+     *
+     * @return number of allocated places for elements
+     */
+    public int getAllocatedSize() {
+        return elements.length;
     }
 
     /**
@@ -291,9 +300,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
      */
     @Override
     public ElementsGetter<T> createElementsGetter() {
-        /*
-        We send reference of current Collection so private static class can "see" variables of non-static class.
-         */
+        // We send reference of current Collection so private static class can "see" variables of non-static class.
         return new ArrayIndexedCollectionElementsGetter<T>(this, modificationCount);
     }
 
@@ -311,6 +318,12 @@ public class ArrayIndexedCollection<T> implements List<T> {
             this.savedModificationCount = savedModificationCount;
         }
 
+        /**
+         * Checks if {@link ArrayIndexedCollectionElementsGetter} has next element.
+         *
+         * @return <code>true</code> if {@link ArrayIndexedCollectionElementsGetter} has next element,
+         * <code>false</code> otherwise
+         */
         @Override
         public boolean hasNextElement() {
             if (savedModificationCount != collectionReference.modificationCount)
@@ -318,6 +331,11 @@ public class ArrayIndexedCollection<T> implements List<T> {
             return currentElementIndex < collectionReference.size;
         }
 
+        /**
+         * Returns next element of {@link ArrayIndexedCollectionElementsGetter}.
+         *
+         * @return next element of {@link ArrayIndexedCollectionElementsGetter}
+         */
         @Override
         public T getNextElement() {
             if (hasNextElement())
